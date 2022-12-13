@@ -37,7 +37,7 @@ from sklearn.linear_model import HuberRegressor
 from SIAC.reproject import reproject_data, array_to_raster
 from scipy.ndimage import binary_dilation, binary_erosion
 from SIAC.read_MCD43 import get_kernel_weights, get_bounds, smooth, get_kk, getKernelWeights
-from SIAC.MCD43_GEE import read_MCD3_GEE
+#from SIAC.MCD43_GEE import read_MCD3_GEE
 
 if (sys.version_info[0] == 3) & (sys.version_info[1] >= 4):
     multiprocessing.set_start_method('spawn', force=True)
