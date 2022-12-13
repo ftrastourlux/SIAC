@@ -23,6 +23,7 @@ file_path = os.path.dirname(os.path.realpath(__file__))
 test_url = 'https://e4ftl01.cr.usgs.gov/MOTA/MCD43A1.006/2000.02.24/MCD43A1.A2000055.h32v08.006.2016101152216.hdf.xml'
 
 def get_auth(logger):
+    print('get_auth')
     try:
         auth = tuple([os.environ['Earthdata_user'], os.environ['Earthdata_pass']])
         with requests.Session() as s:                                            
@@ -39,13 +40,16 @@ def get_auth(logger):
         #logger.error('Environment variables Earthdata_user and Earthdata_pass for accessing NASA Earthdata are not set, and trying to read from file or input.')
         pass
     if os.path.exists(file_path + '/data/.earthdata_auth'):
+        print('using values from /data/.earthdata_auth')
         try:
             username, password = np.loadtxt(file_path + '/data/.earthdata_auth', dtype=str)
+            print(f'values are {username=}/{password}')
             auth = tuple([username, password])
             with requests.Session() as s:
                 s.auth = auth
                 r1     = s.get(test_url)
                 r      = s.get(r1.url, stream=True, headers={'user-agent': 'My app'}) 
+            print(f'status code is {r.status_code}')
             while r.status_code == 401:                 
                 logger.error('Wrong username and password stored, please enter again')
                 username = input('Username for NASA Earthdata: ')      
@@ -63,6 +67,7 @@ def get_auth(logger):
             auth = tuple([username, password])
 
         except:
+            logger.exception('connexion using user/password failed')
             logger.error('Please provide NASA Earthdata username and password for downloading MCD43 data, which can be applied here: https://urs.earthdata.nasa.gov.')
             username = input('Username for NASA Earthdata: ')
             password = getpass.getpass('Password for NASA Earthdata: ')
