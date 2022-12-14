@@ -162,7 +162,7 @@ def get_one_tile(tile_date):
     base = 'https://e4ftl01.cr.usgs.gov/MOTA/MCD43A1.006/'
     tile, date = tile_date
     for j in range(100):
-        logger.info(f'get_one_tile: requesting {base + date}')
+        print(f'get_one_tile: requesting {base + date}')
         r = requests.get(base + date)
         fname = [i.split('>')[-1] for i in r.content.decode().split('</') if (i[-3:]=='hdf') & (tile in i)]
         if len(fname) == 1:
@@ -178,9 +178,9 @@ def downloader(url_fname, auth):
     with requests.Session() as s:
         s.max_redirects = 100000
         s.auth = auth
-        logger.info( f'downloader: getting {url} (auth={auth[0]}/{auth[1]})' )
+        print( f'downloader: getting {url} (auth={auth[0]}/{auth[1]})' )
         r1     = s.get(url)
-        logger.info( f'downloader: getting {r1.url} (auth={auth[0]}/{auth[1]})' )
+        print( f'downloader: getting {r1.url} (auth={auth[0]}/{auth[1]})' )
         r      = s.get(r1.url, stream=True, headers={'user-agent': 'My app'})
         if r.ok:
             remote_size = int(r.headers['Content-Length'])
