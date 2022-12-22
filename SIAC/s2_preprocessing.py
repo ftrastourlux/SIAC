@@ -160,14 +160,27 @@ def s2_pre_processing(s2_dir, cams_dir, dem):
                     aws.append(j)
     s2_tiles = []
     for metafile in scihub + aws:
+        tile, sensing_time = None, None
+        print( f'Checking metadata file {metafile}...')
+
         with open(metafile) as f:
             for i in f.readlines():
                 if 'TILE_ID' in i:
-                    tile  = i.split('</')[0].split('>')[-1]
+                    try:
+                        tile  = i.split('</')[0].split('>')[-1]
+                    except:
+                        pass
                 if 'SENSING_TIME' in i:
-                    sensing_time = i.split('</')[0].split('>')[-1]
-                    obs_time = datetime.datetime.strptime(sensing_time, u'%Y-%m-%dT%H:%M:%S.%fZ')
-
+                    try:
+                        sensing_time = i.split('</')[0].split('>')[-1]
+                        obs_time = datetime.datetime.strptime(sensing_time, u'%Y-%m-%dT%H:%M:%S.%fZ')
+                    except:
+                        pass
+        
+        if None in (tile, sensing_time):
+            print( f'Wrong metadata file {metafile} ignored')
+            continue  
+        
         log_file = os.path.dirname(metafile) + '/SIAC_S2.log'
         if os.path.exists(log_file):
             os.remove(log_file)
@@ -176,6 +189,7 @@ def s2_pre_processing(s2_dir, cams_dir, dem):
 
         s2_file_dir = os.path.dirname(metafile)
         PRODUCT_ID = s2_file_dir.split('/')[-3]
+        logger.info( f'PRODUCT_ID is {PRODUCT_ID}')
         processing_baseline = PRODUCT_ID.split('_')[3][1:]
         
         logger.info('Preprocessing for %s'%PRODUCT_ID)
